@@ -524,6 +524,76 @@
       color: #8bd28e;
     }
 
+    /* ===== Raise Hand ===== */
+    .icon-hand { background: #7a5c10; }
+
+    .icon-hand.active { background: #c8930a; }
+
+    .sb-ctrl-btn.hand-raised .icon-hand {
+      animation: hand-bounce 0.5s ease infinite alternate;
+    }
+
+    @keyframes hand-bounce {
+      from { transform: rotate(-10deg) scale(1); }
+      to   { transform: rotate(10deg) scale(1.15); }
+    }
+
+    /* Banner that shows on YOUR OWN screen when hand is up */
+    .hand-raised-banner {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-120px);
+      background: linear-gradient(135deg, #c8930a, #ffb454);
+      color: #1a1200;
+      padding: 12px 28px;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 6px 24px #ffb45455;
+      transition: transform 0.35s cubic-bezier(.34,1.56,.64,1);
+      z-index: 4000;
+      white-space: nowrap;
+    }
+
+    .hand-raised-banner.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Toast for friend's raised hand */
+    .hand-toast {
+      position: fixed;
+      bottom: 56px;
+      left: 50%;
+      transform: translateX(-50%) translateY(120px);
+      background: #1a1e1b;
+      border: 1.5px solid var(--accent);
+      color: var(--text);
+      padding: 14px 28px;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 6px 28px #ffb45433;
+      transition: transform 0.35s cubic-bezier(.34,1.56,.64,1);
+      z-index: 4000;
+      white-space: nowrap;
+    }
+
+    .hand-toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .hand-toast-emoji {
+      font-size: 26px;
+      animation: hand-bounce 0.5s ease infinite alternate;
+    }
+
     /* Floating Circular Videos */
     .video-tile {
       position: fixed;
@@ -732,17 +802,21 @@
           ⚙ Video call controls
         </div>
         <div class="sb-ctrl-grid">
-          <button class="sb-ctrl-btn" id="unmuteBtn" style="display:none;">
+          <button class="sb-ctrl-btn visible" id="unmuteBtn">
             <div class="sb-ctrl-icon icon-mute">🔇</div>
             <span class="sb-ctrl-label">Mute friend</span>
           </button>
-          <button class="sb-ctrl-btn" id="camBtn" style="display:none;">
+          <button class="sb-ctrl-btn visible" id="camBtn">
             <div class="sb-ctrl-icon icon-cam">📹</div>
             <span class="sb-ctrl-label">Toggle Camera</span>
           </button>
-          <button class="sb-ctrl-btn" id="micBtn" style="display:none;">
+          <button class="sb-ctrl-btn visible" id="micBtn">
             <div class="sb-ctrl-icon icon-mic">🎙️</div>
             <span class="sb-ctrl-label">Toggle Mic</span>
+          </button>
+          <button class="sb-ctrl-btn visible" id="raiseHandBtn" style="grid-column: 1 / -1;">
+            <div class="sb-ctrl-icon icon-hand" id="raiseHandIcon">✋</div>
+            <span class="sb-ctrl-label" id="raiseHandLabel">Raise Hand</span>
           </button>
         </div>
 
@@ -767,10 +841,20 @@
     </div>
   </div>
 
-  <!-- Floating Videos -->
-  <div class="video-tile" id="remoteTile">
-    <div class="drag-handle"></div>
-    <video id="remoteVideo" autoplay playsinline></video>
+  <!-- Remote video (hidden, audio only — visual shown in sidebar circle) -->
+  <video id="remoteVideo" autoplay playsinline style="display:none;"></video>
+  <div id="remoteTile" style="display:none;"></div>
+
+  <!-- Hand raised: YOUR own banner (top center) -->
+  <div class="hand-raised-banner" id="myHandBanner">
+    ✋ You raised your hand!
+    <span style="font-size:12px; font-weight:500; opacity:.8;">(click again to lower)</span>
+  </div>
+
+  <!-- Hand raised: FRIEND's notification toast (bottom center) -->
+  <div class="hand-toast" id="friendHandToast">
+    <span class="hand-toast-emoji">✋</span>
+    <span id="friendHandMsg">Your friend raised their hand!</span>
   </div>
 
   <!-- Permission Modal -->
@@ -1000,6 +1084,28 @@
       }
     };
 
+    // ===== Raise Hand =====
+    let handRaised = false;
+    const raiseHandBtn = document.getElementById('raiseHandBtn');
+    const raiseHandIcon = document.getElementById('raiseHandIcon');
+    const raiseHandLabel = document.getElementById('raiseHandLabel');
+    const myHandBanner = document.getElementById('myHandBanner');
+
+    raiseHandBtn.onclick = () => {
+      handRaised = !handRaised;
+      // Update button appearance
+      raiseHandIcon.classList.toggle('active', handRaised);
+      raiseHandBtn.classList.toggle('hand-raised', handRaised);
+      raiseHandLabel.textContent = handRaised ? 'Lower Hand' : 'Raise Hand';
+      raiseHandBtn.style.borderColor = handRaised ? 'var(--accent)' : '';
+      // Show/hide own banner
+      myHandBanner.classList.toggle('show', handRaised);
+      // Notify friend via data channel
+      if (dataConn && dataConn.open) {
+        dataConn.send({ type: 'raise_hand', raised: handRaised });
+      }
+    };
+
 
     function tuneMediaConnection(conn) {
       if (!conn) return;
@@ -1025,7 +1131,7 @@
     function attachRemoteStream(remoteStream) {
       remoteVideo.srcObject = remoteStream;
       remoteVideo.play().catch(() => { });
-      remoteTile.style.display = 'block';
+      // remoteTile no longer used (floating tile removed)
       unmuteBtn.classList.add('visible');
       // Also show circular preview in sidebar
       const sbVideoCircle = document.getElementById('sbVideoCircle');
@@ -1059,7 +1165,7 @@
       roomHostId = null;
       role = null;
       remoteVideo.srcObject = null;
-      remoteTile.style.display = 'none';
+          // remoteTile no longer used
       unmuteBtn.classList.remove('visible');
       sbFriend.textContent = 'None';
       resetCallTimer();
@@ -1100,7 +1206,7 @@
         call.on('stream', remoteStream => attachRemoteStream(remoteStream));
         call.on('close', () => {
           remoteVideo.srcObject = null;
-          remoteTile.style.display = 'none';
+              // remoteTile no longer used
           resetCallTimer();
         });
         tuneMediaConnection(call);
@@ -1119,7 +1225,7 @@
         call.on('close', () => {
           if (mediaConn === call) {
             remoteVideo.srcObject = null;
-            remoteTile.style.display = 'none';
+                // remoteTile no longer used
             resetCallTimer();
           }
         });
@@ -1267,6 +1373,25 @@
         player.pauseVideo();
       } else if (msg.type === 'seek') {
         player.seekTo(msg.time, true);
+      } else if (msg.type === 'raise_hand') {
+        // Friend raised / lowered hand
+        const friendHandToast = document.getElementById('friendHandToast');
+        const friendHandMsg = document.getElementById('friendHandMsg');
+        if (msg.raised) {
+          friendHandMsg.textContent = '✨ Your friend raised their hand!';
+          friendHandToast.classList.add('show');
+        } else {
+          friendHandMsg.textContent = 'Your friend lowered their hand.';
+          friendHandToast.classList.add('show');
+          setTimeout(() => friendHandToast.classList.remove('show'), 2500);
+        }
+        // auto-hide the 'raised' toast after 8s if not explicitly lowered
+        if (msg.raised) {
+          clearTimeout(window._handToastTimer);
+          window._handToastTimer = setTimeout(() => friendHandToast.classList.remove('show'), 8000);
+        }
+        applyingRemote = false; // don't block playback sync
+        return;
       }
 
       if (typeof msg.time === 'number') lastKnownTime = msg.time;
