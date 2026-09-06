@@ -60,7 +60,7 @@
 
     .layout {
       display: grid;
-      grid-template-columns: 1fr 300px;
+      grid-template-columns: 1fr 320px;
       gap: 0;
       min-height: calc(100vh - 106px);
     }
@@ -144,27 +144,377 @@
       cursor: not-allowed;
     }
 
+    /* ===== SIDEBAR — new design ===== */
     .sidebar {
       border-left: 1px solid var(--line);
-      padding: 24px;
+      background: #111614;
       display: flex;
       flex-direction: column;
-      gap: 22px;
+      gap: 0;
+      overflow: hidden;
+      position: relative;
     }
 
-    .block {
+    /* Sidebar header */
+    .sb-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .sb-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .sb-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: #1e2320;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      border: 1px solid #2a302b;
+    }
+
+    .sb-title {
+      line-height: 1.2;
+    }
+
+    .sb-title h2 {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .sb-title h2 span {
+      color: var(--accent);
+    }
+
+    .sb-title p {
+      margin: 0;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: .3px;
+    }
+
+    .sb-menu-btn {
+      background: #1e2320;
+      border: 1px solid #2a302b;
+      color: var(--muted);
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 16px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .sb-menu-btn:hover {
+      filter: brightness(1.2);
+    }
+
+    /* Sidebar body */
+    .sb-body {
+      padding: 20px;
       display: flex;
       flex-direction: column;
+      gap: 16px;
+      flex: 1;
+    }
+
+    /* Room code card */
+    .sb-card {
+      background: #1a1e1b;
+      border: 1px solid #242b25;
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    .sb-card-label {
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: .5px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
       gap: 8px;
     }
 
-    .block h2 {
-      font-size: 12px;
-      color: var(--muted);
-      margin: 0 0 2px;
+    .sb-card-label .label-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: #222824;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .sb-room-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .sb-room-row input {
+      flex: 1;
+      background: #111614;
+      border: 1px solid #2d342e;
+      color: var(--text);
+      padding: 11px 14px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 500;
+      outline: none;
+      transition: border-color .2s;
+    }
+
+    .sb-room-row input:focus {
+      border-color: var(--accent);
+    }
+
+    .sb-room-row input::placeholder {
+      color: #4a5a4b;
+    }
+
+    .sb-join-btn {
+      background: var(--accent);
+      color: #1a1508;
+      border: none;
+      padding: 11px 18px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: filter .2s, transform .1s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .sb-join-btn:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+
+    .sb-join-btn:disabled {
+      opacity: .4;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Connected status */
+    .sb-connected-card {
+      background: #0f1f11;
+      border: 1px solid #1d3a1f;
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .sb-connected-card.visible {
+      display: flex;
+    }
+
+    .sb-conn-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sb-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #4caf50;
+      box-shadow: 0 0 8px #4caf5088;
+      animation: pulse-dot 1.8s infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { box-shadow: 0 0 6px #4caf5066; }
+      50% { box-shadow: 0 0 14px #4caf5099; }
+    }
+
+    .sb-conn-text strong {
+      display: block;
+      font-size: 14px;
+      color: #8bd28e;
       font-weight: 600;
     }
 
+    .sb-conn-text span {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .sb-leave-btn {
+      background: transparent;
+      border: 1px solid #b84040;
+      color: #e07070;
+      padding: 8px 12px;
+      border-radius: 9px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+      transition: background .2s, color .2s;
+    }
+
+    .sb-leave-btn:hover {
+      background: #b8404022;
+    }
+
+    /* Status text (disconnected state) */
+    .sb-status-text {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .sb-status-text.live {
+      color: #8bd28e;
+    }
+
+    /* Controls section */
+    .sb-section-title {
+      font-size: 13px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-weight: 500;
+    }
+
+    /* Control button grid */
+    .sb-ctrl-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .sb-ctrl-btn {
+      background: #1a1e1b;
+      border: 1px solid #242b25;
+      border-radius: 14px;
+      padding: 16px 8px 14px;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: border-color .2s, background .2s, transform .15s;
+    }
+
+    .sb-ctrl-btn.visible {
+      display: flex;
+    }
+
+    .sb-ctrl-btn:hover {
+      background: #202520;
+      border-color: #3a463b;
+      transform: translateY(-2px);
+    }
+
+    .sb-ctrl-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      transition: transform .15s;
+    }
+
+    .sb-ctrl-btn:hover .sb-ctrl-icon {
+      transform: scale(1.08);
+    }
+
+    .icon-mute  { background: #7b3232; }
+    .icon-cam   { background: #2860b4; }
+    .icon-mic   { background: #1e7a3a; }
+
+    .sb-ctrl-label {
+      font-size: 11px;
+      color: var(--text);
+      font-weight: 500;
+      text-align: center;
+    }
+
+    /* Circular remote video preview */
+    .sb-video-wrap {
+      display: flex;
+      justify-content: center;
+      padding: 10px 0 6px;
+    }
+
+    .sb-video-circle {
+      width: 170px;
+      height: 170px;
+      border-radius: 50%;
+      background: #1a1e1b;
+      border: 3px solid var(--accent);
+      box-shadow: 0 0 24px #ffb45440;
+      overflow: hidden;
+      display: none;
+      position: relative;
+    }
+
+    .sb-video-circle.visible {
+      display: block;
+    }
+
+    .sb-video-circle video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Wave footer */
+    .sb-wave-footer {
+      margin-top: auto;
+      position: relative;
+      height: 120px;
+      overflow: hidden;
+    }
+
+    .sb-wave-footer svg {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+    }
+
+    .sb-tagline {
+      position: absolute;
+      bottom: 28px;
+      width: 100%;
+      text-align: center;
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: #8f9a9066;
+      text-transform: uppercase;
+      z-index: 2;
+      line-height: 1.7;
+    }
+
+    /* keep old status classes working for JS */
     .status {
       font-size: 13px;
       color: var(--muted);
@@ -336,22 +686,84 @@
     </div>
 
     <div class="sidebar">
-      <div class="block">
-        <h2>Room code</h2>
-        <div class="connect-row">
-          <input id="roomInput" placeholder="e.g. movienight" />
-          <button id="joinBtn">Join</button>
+
+      <!-- Sidebar header -->
+      <div class="sb-header">
+        <div class="sb-brand">
+          <div class="sb-logo">📹</div>
+          <div class="sb-title">
+            <h2>Video <span>Room</span></h2>
+            <p>Connect • Learn • Together</p>
+          </div>
         </div>
-        <div class="status" id="peerStatus">Enter a room code — whoever types the same one lands in the same room.</div>
-        <button class="secondary" id="leaveBtn" style="align-self:flex-start; display:none;">Leave room</button>
+        <button class="sb-menu-btn" title="Menu">⋯</button>
       </div>
 
-      <div class="block">
-        <h2>Video call Controls</h2>
-        <button class="secondary" id="unmuteBtn" style="align-self:flex-start; display:none;">Unmute friend</button>
-        <button class="secondary" id="camBtn" style="align-self:flex-start; display:none;">Toggle Camera</button>
-        <button class="secondary" id="micBtn" style="align-self:flex-start; display:none;">Toggle Mic</button>
+      <div class="sb-body">
+
+        <!-- Room code card -->
+        <div class="sb-card">
+          <div class="sb-card-label">
+            <div class="label-icon">🔗</div>
+            Room code
+          </div>
+          <div class="sb-room-row">
+            <input id="roomInput" placeholder="Together" />
+            <button class="sb-join-btn" id="joinBtn">Join →</button>
+          </div>
+          <!-- hidden peerStatus text kept for JS compatibility -->
+          <div class="status sb-status-text" id="peerStatus" style="margin-top:8px;">Enter a room code — whoever types the same one lands in the same room.</div>
+        </div>
+
+        <!-- Connected status card -->
+        <div class="sb-connected-card" id="sbConnectedCard">
+          <div class="sb-conn-left">
+            <div class="sb-dot"></div>
+            <div class="sb-conn-text">
+              <strong>Connected</strong>
+              <span>You are in the room</span>
+            </div>
+          </div>
+          <button class="sb-leave-btn" id="leaveBtn" style="display:none;">⬡ Leave room</button>
+        </div>
+
+        <!-- Video call controls -->
+        <div class="sb-section-title">
+          ⚙ Video call controls
+        </div>
+        <div class="sb-ctrl-grid">
+          <button class="sb-ctrl-btn" id="unmuteBtn" style="display:none;">
+            <div class="sb-ctrl-icon icon-mute">🔇</div>
+            <span class="sb-ctrl-label">Mute friend</span>
+          </button>
+          <button class="sb-ctrl-btn" id="camBtn" style="display:none;">
+            <div class="sb-ctrl-icon icon-cam">📹</div>
+            <span class="sb-ctrl-label">Toggle Camera</span>
+          </button>
+          <button class="sb-ctrl-btn" id="micBtn" style="display:none;">
+            <div class="sb-ctrl-icon icon-mic">🎙️</div>
+            <span class="sb-ctrl-label">Toggle Mic</span>
+          </button>
+        </div>
+
+        <!-- Circular remote video preview -->
+        <div class="sb-video-wrap">
+          <div class="sb-video-circle" id="sbVideoCircle">
+            <!-- remote video is shown here as circular preview -->
+          </div>
+        </div>
+
       </div>
+
+      <!-- Wave footer -->
+      <div class="sb-wave-footer">
+        <div class="sb-tagline">Better Conversations<br>Brighter Tomorrow</div>
+        <svg viewBox="0 0 320 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+          <path d="M0,40 C60,10 120,70 180,40 C240,10 300,60 320,40 L320,80 L0,80 Z" fill="#1a1e0f" opacity="0.6"/>
+          <path d="M0,55 C80,25 160,75 240,50 C280,37 310,55 320,48 L320,80 L0,80 Z" fill="#141a10" opacity="0.8"/>
+        </svg>
+      </div>
+
     </div>
   </div>
 
@@ -503,8 +915,8 @@
         }
       }
       tuneLocalStream(localStream);
-      camBtn.style.display = 'inline-block';
-      micBtn.style.display = 'inline-block';
+      camBtn.classList.add('visible');
+      micBtn.classList.add('visible');
       updateDeviceStatus();
       if (streamPromiseResolve) streamPromiseResolve(localStream);
     };
@@ -614,7 +1026,20 @@
       remoteVideo.srcObject = remoteStream;
       remoteVideo.play().catch(() => { });
       remoteTile.style.display = 'block';
-      unmuteBtn.style.display = 'inline-block';
+      unmuteBtn.classList.add('visible');
+      // Also show circular preview in sidebar
+      const sbVideoCircle = document.getElementById('sbVideoCircle');
+      if (sbVideoCircle && !sbVideoCircle.querySelector('video')) {
+        const previewVid = document.createElement('video');
+        previewVid.autoplay = true;
+        previewVid.playsInline = true;
+        previewVid.muted = true;
+        previewVid.srcObject = remoteStream;
+        sbVideoCircle.appendChild(previewVid);
+      } else if (sbVideoCircle) {
+        sbVideoCircle.querySelector('video').srcObject = remoteStream;
+      }
+      if (sbVideoCircle) sbVideoCircle.classList.add('visible');
       sbFriend.textContent = 'Connected ✅';
       startCallTimer();
       toast.classList.remove('show');
@@ -635,16 +1060,23 @@
       role = null;
       remoteVideo.srcObject = null;
       remoteTile.style.display = 'none';
-      unmuteBtn.style.display = 'none';
+      unmuteBtn.classList.remove('visible');
       sbFriend.textContent = 'None';
       resetCallTimer();
       leaveBtn.style.display = 'none';
+      document.getElementById('sbConnectedCard').classList.remove('visible');
+      const sbVideoCircle = document.getElementById('sbVideoCircle');
+      if (sbVideoCircle) {
+        sbVideoCircle.classList.remove('visible');
+        const pv = sbVideoCircle.querySelector('video');
+        if (pv) { pv.srcObject = null; sbVideoCircle.removeChild(pv); }
+      }
 
       if (stopLocal && localStream) {
         localStream.getTracks().forEach(track => track.stop());
         localStream = null;
-        camBtn.style.display = 'none';
-        micBtn.style.display = 'none';
+        camBtn.classList.remove('visible');
+        micBtn.classList.remove('visible');
         updateDeviceStatus();
       }
 
@@ -727,7 +1159,8 @@
         role = 'host';
         peerStatusEl.textContent = 'Room "' + code + '" created — waiting for your friend to join…';
         sbRoom.textContent = '🟢 ' + code;
-        leaveBtn.style.display = 'inline-block';
+        leaveBtn.style.display = 'inline-flex';
+        document.getElementById('sbConnectedCard').classList.add('visible');
       });
 
       peer.on('error', err => {
@@ -754,7 +1187,8 @@
       peer.on('open', () => {
         role = 'guest';
         sbRoom.textContent = '🟢 ' + code;
-        leaveBtn.style.display = 'inline-block';
+        leaveBtn.style.display = 'inline-flex';
+        document.getElementById('sbConnectedCard').classList.add('visible');
 
         dataConn = peer.connect(roomHostId, { reliable: true });
         dataConn.on('open', () => {
